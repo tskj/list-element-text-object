@@ -71,7 +71,7 @@ export const calculate_text_object = (s: string, cursor_index: number): [number,
           nesting_level++;
         }
 
-        if (s[i] === "," && have_found_cursor) {
+        if (s[i] === "," && have_found_cursor && nesting_level === cursor_nesting_level) {
           relevant_list_separator_index = i;
           if (s[i+1] === " ") {
             has_trailing_space = true;

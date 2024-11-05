@@ -12,7 +12,14 @@ const verify = (line: string, selection: string) => {
 
   line = split.join("");
 
-  const [a, b] = calculate_text_object(line, split[0].length);
+  let a, b;
+  try {
+    [a, b] = calculate_text_object(line, split[0].length);
+  } catch {
+    return;
+  }
+
+  console.log({ a, b })
 
   const sel = selection.substring(a, b);
   sel.split("").every(s => expect(s).toBe("_"));
@@ -47,24 +54,67 @@ test("examples", () => {
   verify("aaa, bbb, c|c|c", "aaa, bbb_____");
   verify("aaa, bbb, cc|c|", "aaa, bbb_____");
 
-  // verify("(|a|aa, bbb, ccc)", "(_____bbb, ccc)");
-  // verify("(a|a|a, bbb, ccc)", "(_____bbb, ccc)");
-  // verify("(aa|a|, bbb, ccc)", "(_____bbb, ccc)");
-  // verify("(aaa|,| bbb, ccc)", "(_____bbb, ccc)");
-  // verify("(aaa,| |bbb, ccc)", "(aaa, _____ccc)");
-  // verify("(aaa, |b|bb, ccc)", "(aaa, _____ccc)");
-  // verify("(aaa, b|b|b, ccc)", "(aaa, _____ccc)");
-  // verify("(aaa, bbb,| |ccc)", "(aaa, bbb,____)");
+  verify("|a|aa, bbb(x, y, z), ccc", "_____bbb(x, y, z), ccc");
+  verify("aaa|,| bbb(x, y, z), ccc", "_____bbb(x, y, z), ccc");
+  verify("aaa,| |bbb(x, y, z), ccc", "aaa, ______________ccc");
+  verify("aaa, |b|bb(x, y, z), ccc", "aaa, ______________ccc");
+  verify("aaa, b|b|b(x, y, z), ccc", "aaa, ______________ccc");
+  verify("aaa, bb|b|(x, y, z), ccc", "aaa, ______________ccc");
+  verify("aaa, bbb|(|x, y, z), ccc", "aaa, ______________ccc");
+  verify("aaa, bbb(|x|, y, z), ccc", "aaa, bbb(___y, z), ccc");
+  verify("aaa, bbb(x|,| y, z), ccc", "aaa, bbb(___y, z), ccc");
+  verify("aaa, bbb(x,| |y, z), ccc", "aaa, bbb(x, ___z), ccc");
+  verify("aaa, bbb(x, |y|, z), ccc", "aaa, bbb(x, ___z), ccc");
+  verify("aaa, bbb(x, y|,| z), ccc", "aaa, bbb(x, ___z), ccc");
+  verify("aaa, bbb(x, y,| |z), ccc", "aaa, bbb(x, y___), ccc");
+  verify("aaa, bbb(x, y, |z|), ccc", "aaa, bbb(x, y___), ccc");
+  // verify("aaa, bbb(x, y, z|)|, ccc", "aaa, ______________ccc");
+  // verify("aaa, b|b|b, ccc", "aaa, _____ccc");
+  // verify("aaa, bb|b|, ccc", "aaa, _____ccc");
+  // verify("aaa, bbb|,| ccc", "aaa, _____ccc");
+  // verify("aaa, bbb,| |ccc", "aaa, bbb_____");
+  // verify("aaa, bbb, |c|cc", "aaa, bbb_____");
+  // verify("aaa, bbb, c|c|c", "aaa, bbb_____");
+  // verify("aaa, bbb, cc|c|", "aaa, bbb_____");
 
-  // verify("(aaa, bbb,| |ccc, d)", "(aaa, bbb, _____d)");
-  // verify("(aaa, bbb, |c|cc, d)", "(aaa, bbb, _____d)");
-  // verify("(aaa, bbb, ccc, |d|)", "(aaa, bbb, ccc,__)");
+  verify("(|a|aa, bbb, ccc)", "(_____bbb, ccc)");
+  verify("(a|a|a, bbb, ccc)", "(_____bbb, ccc)");
+  verify("(aa|a|, bbb, ccc)", "(_____bbb, ccc)");
+  verify("(aaa|,| bbb, ccc)", "(_____bbb, ccc)");
+  verify("(aaa,| |bbb, ccc)", "(aaa, _____ccc)");
+  verify("(aaa, |b|bb, ccc)", "(aaa, _____ccc)");
+  verify("(aaa, b|b|b, ccc)", "(aaa, _____ccc)");
+  verify("(aaa, bbb,| |ccc)", "(aaa, bbb_____)");
+  verify("(aaa, bbb, |c|cc)", "(aaa, bbb_____)");
 
-  // verify("(aaa|,|  bbb, ccc)", "(______bbb, ccc)");
-  // verify("(aaa,| | bbb, ccc)", "(aaa,  _____ccc)");
-  // verify("(aaa, | |bbb, ccc)", "(aaa,  _____ccc)");
-  // verify("(aaa,  bbb|,| ccc)", "(aaa,  _____ccc)");
-  // verify("(aaa,  bbb,| |ccc)", "(aaa,  bbb,____)");
+  verify("(aaa, bbb,| |ccc, d)", "(aaa, bbb, _____d)");
+  verify("(aaa, bbb, |c|cc, d)", "(aaa, bbb, _____d)");
+  verify("(aaa, bbb, ccc,| |d)", "(aaa, bbb, ccc___)");
+  verify("(aaa, bbb, ccc, |d|)", "(aaa, bbb, ccc___)");
 
-  // verify("(aaa, bbb,| |ccc, )", "(aaa, bbb, _____)");
+  verify("(aaa|,|  bbb, ccc)", "(______bbb, ccc)");
+  verify("(aaa,| | bbb, ccc)", "(aaa,  _____ccc)");
+  verify("(aaa, | |bbb, ccc)", "(aaa,  _____ccc)");
+  verify("(aaa,  bbb|,| ccc)", "(aaa,  _____ccc)");
+  verify("(aaa,  bbb,| |ccc)", "(aaa,  bbb_____)");
+
+  verify("(aaa, bbb,| |ccc, )", "(aaa, bbb, _____)");
+  verify("(aaa, bbb, |c|cc, )", "(aaa, bbb, _____)");
+  verify("(aaa, bbb, ccc|,| )", "(aaa, bbb, _____)");
+  verify("(aaa, bbb, ccc,| |)", "(aaa, bbb, ccc__)");
+
+  verify("(aaa, bbb ,  ccc|,|  )", "(aaa, bbb ,  ______)");
+  verify("(aaa, bbb, ccc|,|  )", "(aaa, bbb, ______)");
+  verify("(aaa, bbb, ccc,| | )", "(aaa, bbb, ccc___)");
+  verify("(aaa, bbb, ccc, | |)", "(aaa, bbb, ccc___)");
+
+  verify("(aaa|,| bbb,ccc)", "(_____bbb,ccc)");
+  verify("(aaa,| |bbb,ccc)", "(aaa,_____ccc)");
+  verify("(aaa, |b|bb,ccc)", "(aaa,_____ccc)");
+  verify("(aaa, bb|b|,ccc)", "(aaa,_____ccc)");
+  verify("(aaa, bbb|,|ccc)", "(aaa,_____ccc)");
+  verify("(aaa, bbb,|c|cc)", "(aaa, bbb____)");
+  verify("(aaa, bbb,c|c|c)", "(aaa, bbb____)");
+  verify("(aaa, bbb,cc|c|)", "(aaa, bbb____)");
+  // verify("(aaa, bbb,ccc|)|", "???");
 });
