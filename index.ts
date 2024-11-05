@@ -59,9 +59,12 @@ export const calculate_text_object = (s: string, cursor_index: number): [number,
 
         const is_closing_paren = s[i] === ")" || s[i] === "]";
         if (is_closing_paren) {
-          if (have_found_cursor && nesting_level === cursor_nesting_level) {
-            end_index = i;
-            has_trailing_space = s[i-1] === " ";
+          if (nesting_level === cursor_nesting_level) {
+            const have_passed_cursor = have_found_cursor && i !== cursor_index;
+            if (have_passed_cursor) {
+              end_index = i;
+              has_trailing_space = s[i-1] === " ";
+            }
           } else {
             nesting_level--;
           }
