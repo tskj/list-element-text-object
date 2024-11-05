@@ -188,4 +188,61 @@ test("examples", () => {
   verify("aaa(1, 2, [43]), bbb(x, y(  a, |b| ), z), ccc", "aaa(1, 2, [43]), bbb(x, y(  a____), z), ccc");
   verify("aaa(1, 2, [43]), bbb(x, y(  a, b| |), z), ccc", "aaa(1, 2, [43]), bbb(x, y(  a____), z), ccc");
   verify("aaa(1, 2, [43]), bbb(x, y(  a, b,| |), z), ccc", "aaa(1, 2, [43]), bbb(x, y(  a, b__), z), ccc");
+
+  verify('(aaa|,| "bbb", ccc)', '(_____"bbb", ccc)');
+  verify('(aaa,| |"bbb", ccc)', '(aaa, _______ccc)');
+  verify('(aaa, |"|bbb", ccc)', '(aaa, _______ccc)');
+  verify('(aaa, "|b|bb", ccc)', '(aaa, _______ccc)');
+  verify('(aaa, "bbb"|,| ccc)', '(aaa, _______ccc)');
+  verify('(aaa, "bbb",| |ccc)', '(aaa, "bbb"_____)');
+
+  verify('(aaa, "b[bb",| |ccc)', '(aaa, "b[bb"_____)');
+  verify('(aaa, "b[b]b",| |ccc)', '(aaa, "b[b]b"_____)');
+  verify('(aaa, "b[,b]b",| |ccc)', '(aaa, "b[,b]b"_____)');
+  verify('(aaa, "b[,b](a,|c|,y)b", ccc)', '(aaa, _________________ccc)');
+  verify('(aaa, "b[\',b](a,|c|,y)b", ccc)', '(aaa, __________________ccc)');
+  verify('(aaa, "b[\\",b](a,|c|,y)b", ccc)', '(aaa, ___________________ccc)');
+
+  verify('(aaa|,| f(a, "f(x, y)", b), ccc)', '(_____f(a, "f(x, y)", b), ccc)');
+  verify('(aaa,| |f(a, "f(x, y)", b), ccc)', '(aaa, ____________________ccc)');
+  verify('(aaa, f|(|a, "f(x, y)", b), ccc)', '(aaa, ____________________ccc)');
+  verify('(aaa, f(a, "f(x, y)", b|)|, ccc)', '(aaa, ____________________ccc)');
+  verify('(aaa, f(a, "f(x, y)", b)|,| ccc)', '(aaa, ____________________ccc)');
+  verify('(aaa, f(a, "f(x, y)", b),| |ccc)', '(aaa, f(a, "f(x, y)", b)_____)');
+  verify('(aaa, f(a, "f(x, y)", |b|), ccc)', '(aaa, f(a, "f(x, y)"___), ccc)');
+  verify('(aaa, f(a, "f(x, y)"|,| b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f(x, y)|"|, b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f(x, y|)|", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f(x, |y|)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f(x,| |y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f(x|,| y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f(|x|, y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "f|(|x, y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, "|f|(x, y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a, |"|f(x, y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a,| |"f(x, y)", b), ccc)', '(aaa, f(a, ___________b), ccc)');
+  verify('(aaa, f(a|,| "f(x, y)", b), ccc)', '(aaa, f(___"f(x, y)", b), ccc)');
+  verify('(aaa, f(|a|, "f(x, y)", b), ccc)', '(aaa, f(___"f(x, y)", b), ccc)');
+
+  verify('(aaa, f(a, "f(x, y//)", b|)|, ccc)', '(aaa, ______________________ccc)');
+  verify('(aaa, f(a, "fx, y//)", b|)|, ccc)', '(aaa, _____________________ccc)');
+  verify('(aaa, f(a, "fx((((, y//)", b|)|, ccc)', '(aaa, _________________________ccc)');
+  verify('(aaa, f(a, "fx((|(|(, y//)", b), ccc)', '(aaa, f(a, ________________b), ccc)');
+
+  verify('|a|bc, def, //', '_____def, //');
+  verify('|a|bc, def, // 34, 34', '_____def, // 34, 34');
+  verify('|a|bc, "def", // 34, 34', '_____"def", // 34, 34');
+
+  // TODO: questionable behavior
+  verify('abc, "de|f|" // 34, 34', 'abc________// 34, 34');
+  verify('abc, "de|f|", // 34, 34', 'abc, _______// 34, 34'); // this is correct tho
+
+  // here:
+  verify('abc, "d|,|ef" // 34, 34', 'abc_________// 34, 34');
+  verify('abc, "d,e|f|", // 34, 34', 'abc, ________// 34, 34');
+
+  verify('abc, "de|f|", // 34, 34', 'abc, _______// 34, 34');
+  verify('abc, def, // |3|4, 34', 'abc, def, // 34, 34');
+  verify('abc,| |def, //', 'abc, _____//');
+  verify('abc,| |def, // xyz', 'abc, _____// xyz');
 });

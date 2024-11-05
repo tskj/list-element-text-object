@@ -124,6 +124,11 @@ export const calculate_text_object = (s: string, cursor_index: number): [number,
   if (end_index === null) throw 'expected to have found end_index';
 
   nesting_level = cursor_nesting_level;
+  if (relevant_list_separator_index !== null) state = 'regular';
+  else {
+    if (cursor_is_in_state === null) throw "cursor has no state but we need one because there is no list separator (we're on the last element in a list)"
+    state = cursor_is_in_state;
+  }
 
   let start_index = null;
   for (let i = relevant_list_separator_index ?? cursor_index; i >= 0; i--) {
@@ -132,6 +137,14 @@ export const calculate_text_object = (s: string, cursor_index: number): [number,
     switch (state) {
 
       case 'regular': {
+
+        if (s[i] === "'") {
+          state = 'single-quote-string';
+        }
+        if (s[i] === '"') {
+          state = 'double-quote-string'
+        }
+
         if (s[i] === ")" || s[i] === "]") {
           nesting_level++;
         }
